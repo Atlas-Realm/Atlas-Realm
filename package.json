@@ -1,0 +1,13 @@
+{
+  "name": "atlas-realm",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:desktop": "yarn && yarn workspace tauri-app tauri dev",
+    "dev:android": "yarn && yarn workspace tauri-app tauri android dev",
+    "dev:ios": "yarn && yarn workspace tauri-app tauri ios dev",
+    "dev:server": "yarn && yarn workspace server dev"
+  }
+}
