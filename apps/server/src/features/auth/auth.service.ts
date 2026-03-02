@@ -46,8 +46,8 @@ export const authService = {
       authRepository.findByUsername(username),
     ]);
 
-    if (existingEmail) throw new ConflictError("Email already in use");
-    if (existingUsername) throw new ConflictError("Username already taken");
+    if (existingEmail) throw new ConflictError("auth.email_in_use");
+    if (existingUsername) throw new ConflictError("auth.username_taken");
 
     const passwordHash = await Bun.password.hash(password, { algorithm: "bcrypt", cost: 12 });
     const user = await authRepository.create({ email, username, passwordHash });
@@ -58,10 +58,10 @@ export const authService = {
 
   async login(email: string, password: string) {
     const user = await authRepository.findByEmail(email);
-    if (!user) throw new UnauthorizedError("Invalid credentials");
+    if (!user) throw new UnauthorizedError("auth.invalid_credentials");
 
     const valid = await Bun.password.verify(password, user.passwordHash);
-    if (!valid) throw new UnauthorizedError("Invalid credentials");
+    if (!valid) throw new UnauthorizedError("auth.invalid_credentials");
 
     const tokens = await createTokenPair(user.id, user.email, user.username);
     return { user: { id: user.id, email: user.email, username: user.username }, tokens };
@@ -73,17 +73,17 @@ export const authService = {
     try {
       payload = (await verify(refreshToken, env.JWT_REFRESH_SECRET)) as typeof payload;
     } catch {
-      throw new UnauthorizedError("Invalid refresh token");
+      throw new UnauthorizedError("auth.invalid_refresh_token");
     }
 
     const key = `refresh:${payload.sub}:${payload.jti}`;
     const stored = await RedisCache.get(key);
-    if (!stored) throw new UnauthorizedError("Refresh token revoked or expired");
+    if (!stored) throw new UnauthorizedError("auth.refresh_token_expired");
 
     await RedisCache.del(key);
 
     const user = await authRepository.findById(payload.sub);
-    if (!user) throw new UnauthorizedError("User not found");
+    if (!user) throw new UnauthorizedError("auth.user_not_found");
 
     const tokens = await createTokenPair(user.id, user.email, user.username);
     return { tokens };

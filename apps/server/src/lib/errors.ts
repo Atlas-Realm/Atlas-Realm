@@ -1,40 +1,42 @@
+import type { TranslationKey } from "@/lib/i18n";
+
 export class AppError extends Error {
   constructor(
     public readonly statusCode: number,
-    message: string,
+    public readonly messageKey: TranslationKey,
     public readonly code?: string,
   ) {
-    super(message);
+    super(messageKey);
     this.name = "AppError";
   }
 }
 
 export class UnauthorizedError extends AppError {
-  constructor(message = "Unauthorized") {
-    super(401, message, "UNAUTHORIZED");
+  constructor(messageKey: TranslationKey = "errors.unauthorized") {
+    super(401, messageKey, "UNAUTHORIZED");
   }
 }
 
 export class ForbiddenError extends AppError {
-  constructor(message = "Forbidden") {
-    super(403, message, "FORBIDDEN");
+  constructor(messageKey: TranslationKey = "errors.forbidden") {
+    super(403, messageKey, "FORBIDDEN");
   }
 }
 
 export class NotFoundError extends AppError {
-  constructor(message = "Not found") {
-    super(404, message, "NOT_FOUND");
+  constructor(messageKey: TranslationKey = "errors.not_found") {
+    super(404, messageKey, "NOT_FOUND");
   }
 }
 
 export class ConflictError extends AppError {
-  constructor(message = "Conflict") {
-    super(409, message, "CONFLICT");
+  constructor(messageKey: TranslationKey = "errors.conflict") {
+    super(409, messageKey, "CONFLICT");
   }
 }
 
 export class ExternalApiError extends AppError {
-  constructor(message = "External API error") {
-    super(502, message, "EXTERNAL_API_ERROR");
+  constructor(messageKey: TranslationKey = "errors.external_api") {
+    super(502, messageKey, "EXTERNAL_API_ERROR");
   }
 }

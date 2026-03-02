@@ -12,6 +12,6 @@ export const searchGames = async (c: Context) => {
 export const getGame = async (c: Context) => {
   const { id } = c.req.valid("param" as never) as { id: string };
   const game = await gamesService.getById(id);
-  if (!game) throw new NotFoundError("Game not found");
+  if (!game) throw new NotFoundError("games.not_found");
   return c.json(successResponse(game), 200);
 };
