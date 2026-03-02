@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__docfork__query_docs",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(cd:*)"
+    ]
+  }
+}

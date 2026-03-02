@@ -1,7 +1,14 @@
 {
   "compilerOptions": {
     "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
-  }
+    "jsxImportSource": "hono/jsx",
+    "baseUrl": ".",
+    "paths": { "@/*": ["./src/*"] },
+    "types": ["bun-types"]
+  },
+  "include": ["src/**/*", "drizzle.config.ts"]
 }

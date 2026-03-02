@@ -8,9 +8,6 @@
     "dev:desktop": "yarn && yarn workspace tauri-app tauri dev",
     "dev:android": "yarn && yarn workspace tauri-app tauri android dev",
     "dev:ios": "yarn && yarn workspace tauri-app tauri ios dev",
-    "dev:server": "bun install && bum workspace server dev"
-  },
-  "dependencies": {
-    "@hono/swagger-ui": "^0.5.3"
+    "dev:server": "bun install && bun --filter server dev"
   }
 }

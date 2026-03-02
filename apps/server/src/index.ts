@@ -1,9 +1,8 @@
-import { Hono } from "hono";
+import { createApp } from "./app";
+import { env } from "./config/env";
 
-const app = new Hono();
+const app = createApp();
+console.log(`[Atlas Realm] Server: http://${env.HOST}:${env.PORT}`);
+console.log(`[Atlas Realm] Docs:   http://${env.HOST}:${env.PORT}/api/docs`);
 
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
-
-export default app;
+export default { port: env.PORT, hostname: env.HOST, fetch: app.fetch };
