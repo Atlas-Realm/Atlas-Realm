@@ -29,7 +29,12 @@ export function createApp() {
   });
 
   app.use("*", requestId());
-  app.use("*", logger());
+  const loggerMiddleware = logger();
+  app.use("*", (c, next) => {
+    const skip = ["/api/openapi.json", "/api/docs"];
+    if (skip.includes(c.req.path)) return next();
+    return loggerMiddleware(c, next);
+  });
   app.use(
     "*",
     languageDetector({
