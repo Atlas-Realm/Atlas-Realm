@@ -7,9 +7,7 @@ import { requestId } from "hono/request-id";
 import { env } from "@/config/env";
 import { t } from "@/lib/i18n";
 import { errorHandler } from "@/middleware/error-handler";
-import { authRoutes } from "@/features/auth/auth.routes";
-import { gamesRoutes } from "@/features/games/games.routes";
-import { sessionRoutes } from "@/features/game-sessions/sessions.routes";
+import { authRoutes, gamesRoutes, sessionRoutes } from "@/container";
 
 export function createApp() {
   const app = new OpenAPIHono({

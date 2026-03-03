@@ -1,6 +1,6 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { authMiddleware } from "@/middleware/auth";
-import * as handlers from "./games.handlers";
+import type { GamesController } from "./games.controller";
 
 const GameResultSchema = z.object({
   externalId: z.string(),
@@ -70,6 +70,8 @@ const getGameRoute = createRoute({
   },
 });
 
-export const gamesRoutes = new OpenAPIHono()
-  .openapi(searchRoute, handlers.searchGames)
-  .openapi(getGameRoute, handlers.getGame);
+export function createGamesRoutes(controller: GamesController) {
+  return new OpenAPIHono()
+    .openapi(searchRoute, controller.searchGames)
+    .openapi(getGameRoute, controller.getGame);
+}

@@ -1,6 +1,6 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { authMiddleware } from "@/middleware/auth";
-import * as handlers from "./sessions.handlers";
+import type { SessionsController } from "./sessions.controller";
 
 const SessionSchema = z.object({
   id: z.string(),
@@ -125,9 +125,11 @@ const listRoute = createRoute({
   },
 });
 
-export const sessionRoutes = new OpenAPIHono()
-  .openapi(startRoute, handlers.startSession)
-  .openapi(endRoute, handlers.endSession)
-  .openapi(pauseRoute, handlers.pauseSession)
-  .openapi(resumeRoute, handlers.resumeSession)
-  .openapi(listRoute, handlers.listSessions);
+export function createSessionRoutes(controller: SessionsController) {
+  return new OpenAPIHono()
+    .openapi(startRoute, controller.startSession)
+    .openapi(endRoute, controller.endSession)
+    .openapi(pauseRoute, controller.pauseSession)
+    .openapi(resumeRoute, controller.resumeSession)
+    .openapi(listRoute, controller.listSessions);
+}

@@ -1,5 +1,5 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
-import * as handlers from "./auth.handlers";
+import type { AuthController } from "./auth.controller";
 
 const RegisterBodySchema = z.object({
   email: z.string().email(),
@@ -75,7 +75,9 @@ const refreshRoute = createRoute({
   },
 });
 
-export const authRoutes = new OpenAPIHono()
-  .openapi(registerRoute, handlers.register)
-  .openapi(loginRoute, handlers.login)
-  .openapi(refreshRoute, handlers.refresh);
+export function createAuthRoutes(controller: AuthController) {
+  return new OpenAPIHono()
+    .openapi(registerRoute, controller.register)
+    .openapi(loginRoute, controller.login)
+    .openapi(refreshRoute, controller.refresh);
+}
