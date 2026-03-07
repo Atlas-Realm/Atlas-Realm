@@ -1,6 +1,6 @@
-use rusqlite::{params, Connection, Result};
-use crate::models::GameSession;
+use crate::models::{GameSession, QueuedSessionEvent};
 use chrono::{DateTime, Local};
+use rusqlite::{params, Connection, OptionalExtension, Result};
 use std::path::PathBuf;
 
 pub struct Database {
@@ -11,7 +11,7 @@ impl Database {
     pub fn new(app_dir: PathBuf) -> Result<Self> {
         let db_path = app_dir.join("sessions.db");
         let conn = Connection::open(db_path)?;
-        
+
         conn.execute(
             "CREATE TABLE IF NOT EXISTS game_sessions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,33 +26,38 @@ impl Database {
         )?;
 
         conn.execute(
-            "CREATE TABLE IF NOT EXISTS game_metadata (
-                exe_name TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                platform TEXT NOT NULL,
-                app_id TEXT,
-                icon TEXT,
-                cover_image TEXT,
-                developer TEXT,
-                publisher TEXT,
-                genres TEXT,
-                description TEXT,
-                release_date TEXT,
-                last_updated TEXT NOT NULL
+            "CREATE TABLE IF NOT EXISTS auth_tokens (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                access_token TEXT NOT NULL,
+                refresh_token TEXT NOT NULL,
+                updated_at TEXT NOT NULL
             )",
             [],
         )?;
-        
+
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS api_queue (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                event_type TEXT NOT NULL,
+                payload TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )",
+            [],
+        )?;
+
+        // Legacy table cleanup from metadata enrichment era.
+        conn.execute("DROP TABLE IF EXISTS game_metadata", [])?;
+
         Ok(Self { conn })
     }
 
     pub fn save_or_update_session(&self, session: &mut GameSession) -> Result<()> {
         if let Some(id) = session.id {
             self.conn.execute(
-                "UPDATE game_sessions SET 
-                    last_seen = ?1, 
-                    duration_seconds = ?2, 
-                    is_active = ?3 
+                "UPDATE game_sessions SET
+                    last_seen = ?1,
+                    duration_seconds = ?2,
+                    is_active = ?3
                  WHERE id = ?4",
                 params![
                     session.last_seen.to_rfc3339(),
@@ -79,84 +84,16 @@ impl Database {
         Ok(())
     }
 
-    pub fn save_metadata(&self, metadata: &crate::models::GameMetadata) -> Result<()> {
-        let genres_json = serde_json::to_string(&metadata.genres).unwrap_or_else(|_| "[]".to_string());
-        
-        self.conn.execute(
-            "INSERT OR REPLACE INTO game_metadata (
-                exe_name, name, platform, app_id, icon, cover_image, 
-                developer, publisher, genres, description, release_date, last_updated
-             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)",
-            params![
-                metadata.exe_name,
-                metadata.name,
-                metadata.platform,
-                metadata.app_id,
-                metadata.icon,
-                metadata.cover_image,
-                metadata.developer,
-                metadata.publisher,
-                genres_json,
-                metadata.description,
-                metadata.release_date,
-                Local::now().to_rfc3339(),
-            ],
-        )?;
-        Ok(())
-    }
-
-    pub fn clear_metadata_cache(&self) -> Result<()> {
-        self.conn.execute("DELETE FROM game_metadata", [])?;
-        Ok(())
-    }
-
-    pub fn get_metadata(&self, exe_name: &str) -> Result<Option<crate::models::GameMetadata>> {
-        const CACHE_TTL_DAYS: i64 = 7;
-        
-        let mut stmt = self.conn.prepare(
-            "SELECT name, platform, app_id, icon, cover_image, developer, publisher, genres, description, release_date, last_updated FROM game_metadata WHERE exe_name = ?1",
-        )?;
-        
-        let mut rows = stmt.query(params![exe_name])?;
-        
-        if let Some(row) = rows.next()? {
-            let last_updated: String = row.get(10)?;
-            if let Ok(cached_time) = DateTime::parse_from_rfc3339(&last_updated) {
-                let age = Local::now().signed_duration_since(cached_time.with_timezone(&Local));
-                if age.num_days() > CACHE_TTL_DAYS {
-                    return Ok(None);
-                }
-            }
-            
-            let genres_json: String = row.get(7)?;
-            let genres: Vec<String> = serde_json::from_str(&genres_json).unwrap_or_default();
-            
-            Ok(Some(crate::models::GameMetadata {
-                exe_name: exe_name.to_string(),
-                name: row.get(0)?,
-                platform: row.get(1)?,
-                app_id: row.get(2)?,
-                icon: row.get(3)?,
-                cover_image: row.get(4)?,
-                developer: row.get(5)?,
-                publisher: row.get(6)?,
-                genres,
-                description: row.get(8)?,
-                release_date: row.get(9)?,
-            }))
-        } else {
-            Ok(None)
-        }
-    }
-
     pub fn load_sessions(&self) -> Result<Vec<GameSession>> {
         let mut stmt = self.conn.prepare(
-            "SELECT id, game_name, process_id, start_time, last_seen, duration_seconds, is_active FROM game_sessions ORDER BY start_time DESC",
+            "SELECT id, game_name, process_id, start_time, last_seen, duration_seconds, is_active
+             FROM game_sessions
+             ORDER BY start_time DESC",
         )?;
         let session_iter = stmt.query_map([], |row| {
             let start_time_str: String = row.get(3)?;
             let last_seen_str: String = row.get(4)?;
-            
+
             let start_time = DateTime::parse_from_rfc3339(&start_time_str)
                 .map(|dt| dt.with_timezone(&Local))
                 .unwrap_or_else(|_| Local::now());
@@ -172,6 +109,9 @@ impl Database {
                 last_seen,
                 duration_seconds: row.get(5)?,
                 is_active: row.get(6)?,
+                remote_session_id: None,
+                heartbeat_duration_sent: 0,
+                end_synced: false,
                 needs_save: false,
             })
         })?;
@@ -182,10 +122,103 @@ impl Database {
         }
         Ok(sessions)
     }
+
+    pub fn set_auth_tokens(&self, access_token: &str, refresh_token: &str) -> Result<()> {
+        self.conn.execute(
+            "INSERT INTO auth_tokens (id, access_token, refresh_token, updated_at)
+             VALUES (1, ?1, ?2, ?3)
+             ON CONFLICT(id) DO UPDATE SET
+                access_token = excluded.access_token,
+                refresh_token = excluded.refresh_token,
+                updated_at = excluded.updated_at",
+            params![access_token, refresh_token, Local::now().to_rfc3339()],
+        )?;
+        Ok(())
+    }
+
+    pub fn get_auth_tokens(&self) -> Result<Option<(String, String)>> {
+        self.conn
+            .query_row(
+                "SELECT access_token, refresh_token FROM auth_tokens WHERE id = 1",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .optional()
+    }
+
+    pub fn get_access_token(&self) -> Result<Option<String>> {
+        self.conn
+            .query_row(
+                "SELECT access_token FROM auth_tokens WHERE id = 1",
+                [],
+                |row| row.get(0),
+            )
+            .optional()
+    }
+
+    pub fn clear_auth_tokens(&self) -> Result<()> {
+        self.conn.execute("DELETE FROM auth_tokens WHERE id = 1", [])?;
+        Ok(())
+    }
+
+    pub fn enqueue_session_event(&self, event: &QueuedSessionEvent) -> Result<()> {
+        let event_type = match event {
+            QueuedSessionEvent::Heartbeat { .. } => "heartbeat",
+            QueuedSessionEvent::End { .. } => "end",
+        };
+        let payload = serde_json::to_string(event).unwrap_or_else(|_| "{}".to_string());
+        self.conn.execute(
+            "INSERT INTO api_queue (event_type, payload, created_at) VALUES (?1, ?2, ?3)",
+            params![event_type, payload, Local::now().to_rfc3339()],
+        )?;
+        Ok(())
+    }
+
+    pub fn load_queue_events(&self, limit: i64) -> Result<Vec<(i64, QueuedSessionEvent)>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT id, payload
+             FROM api_queue
+             ORDER BY id ASC
+             LIMIT ?1",
+        )?;
+        let rows = stmt.query_map([limit], |row| {
+            let id: i64 = row.get(0)?;
+            let payload: String = row.get(1)?;
+            let parsed = serde_json::from_str::<QueuedSessionEvent>(&payload)
+                .unwrap_or(QueuedSessionEvent::Heartbeat {
+                    session_id: String::new(),
+                    duration_seconds: 0,
+                });
+            Ok((id, parsed))
+        })?;
+
+        let mut events = Vec::new();
+        for row in rows {
+            let (id, event) = row?;
+            match &event {
+                QueuedSessionEvent::Heartbeat { session_id, .. }
+                | QueuedSessionEvent::End { session_id, .. } => {
+                    if !session_id.is_empty() {
+                        events.push((id, event));
+                    }
+                }
+            }
+        }
+
+        Ok(events)
+    }
+
+    pub fn delete_queue_event(&self, id: i64) -> Result<()> {
+        self.conn.execute("DELETE FROM api_queue WHERE id = ?1", [id])?;
+        Ok(())
+    }
 }
 
 use tauri::Manager;
 
 pub fn get_db_path(app_handle: &tauri::AppHandle) -> PathBuf {
-    app_handle.path().app_data_dir().unwrap_or_else(|_| PathBuf::from("."))
+    app_handle
+        .path()
+        .app_data_dir()
+        .unwrap_or_else(|_| PathBuf::from("."))
 }

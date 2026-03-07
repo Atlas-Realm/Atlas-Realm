@@ -68,6 +68,9 @@ impl SessionTracker {
                     last_seen: now,
                     duration_seconds: 0,
                     is_active: true,
+                    remote_session_id: None,
+                    heartbeat_duration_sent: 0,
+                    end_synced: false,
                     needs_save: true,
                 };
 
@@ -90,6 +93,7 @@ impl SessionTracker {
                 if let Some(session) = self.sessions.get_mut(index) {
                     session.is_active = false;
                     session.needs_save = true; // Always save on exit
+                    session.end_synced = false;
                     println!("🛑 GAME ENDED: {} (Duration: {} sec)", session.game_name, session.duration_seconds);
                 }
             }

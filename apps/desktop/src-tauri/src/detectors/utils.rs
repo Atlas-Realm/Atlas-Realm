@@ -63,22 +63,3 @@ pub fn find_best_exe_recursive(dir_path: &std::path::Path) -> Option<String> {
     candidates.sort_by(|a, b| b.1.cmp(&a.1));
     candidates.first().map(|(name, _)| name.clone())
 }
-
-pub fn clean_game_name(name: &str) -> String {
-    name.replace("™", "")
-        .replace("®", "")
-        .replace("©", "")
-        .replace(" - ", " ")
-        .replace("  ", " ")
-        .replace(": ", " ")
-        .trim()
-        .to_string()
-}
-
-pub fn normalize_for_search(name: &str) -> String {
-    clean_game_name(name)
-        .to_lowercase()
-        .chars()
-        .filter(|c| c.is_alphanumeric() || c.is_whitespace())
-        .collect()
-}

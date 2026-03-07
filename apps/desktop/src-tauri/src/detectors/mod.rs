@@ -1,11 +1,10 @@
 pub mod amazon;
 pub mod epic;
-pub mod registry;
 pub mod steam;
 pub mod ubisoft;
-pub mod xbox;
 pub mod utils;
-pub mod metadata;
+pub mod xbox;
+pub mod registry;
 
 use crate::models::GameMetadata;
 

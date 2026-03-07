@@ -1,4 +1,5 @@
 use crate::models::GameMetadata;
+#[cfg(target_os = "windows")]
 use std::path::Path;
 #[cfg(target_os = "windows")]
 use winreg::enums::*;
@@ -6,7 +7,7 @@ use winreg::enums::*;
 use winreg::RegKey;
 
 pub fn discover_ubisoft_games() -> Vec<GameMetadata> {
-    let mut games = Vec::new();
+    let games = Vec::new();
 
     #[cfg(target_os = "windows")]
     {
@@ -52,9 +53,4 @@ pub fn discover_ubisoft_games() -> Vec<GameMetadata> {
 
     println!("-> Total {} Ubisoft games cached.", games.len());
     games
-}
-
-fn find_largest_exe_in_dir(dir_path: &str) -> Option<String> {
-    let path = Path::new(dir_path);
-    crate::detectors::utils::find_best_exe_recursive(path)
 }

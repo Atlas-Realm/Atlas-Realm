@@ -1,5 +1,5 @@
 use chrono::{DateTime, Local};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Debug, Clone)]
 pub struct GameSession {
@@ -10,6 +10,12 @@ pub struct GameSession {
     pub last_seen: DateTime<Local>,
     pub duration_seconds: i64,
     pub is_active: bool,
+    #[serde(skip)]
+    pub remote_session_id: Option<String>,
+    #[serde(skip)]
+    pub heartbeat_duration_sent: i64,
+    #[serde(skip)]
+    pub end_synced: bool,
     #[serde(skip)]
     pub needs_save: bool,
 }
@@ -33,4 +39,17 @@ pub struct GameMetadata {
 pub struct ProcessInfo {
     pub name: String,
     pub pid: u32,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct LibraryIndexEntry {
+    pub exe_name: String,
+    pub game_id: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum QueuedSessionEvent {
+    Heartbeat { session_id: String, duration_seconds: i64 },
+    End { session_id: String, duration_seconds: i64 },
 }

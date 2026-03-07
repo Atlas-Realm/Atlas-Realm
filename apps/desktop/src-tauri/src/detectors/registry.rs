@@ -1,10 +1,12 @@
 use std::collections::HashSet;
+#[cfg(target_os = "windows")]
 use std::path::Path;
 #[cfg(target_os = "windows")]
 use winreg::enums::*;
 #[cfg(target_os = "windows")]
 use winreg::RegKey;
 
+#[cfg(target_os = "windows")]
 const KNOWN_GAME_PUBLISHERS: &[&str] = &[
     "ubisoft", "ea games", "electronic arts", "riot games", "rockstar games",
     "bethesda", "activision", "blizzard", "valve", "epic games", "2k games",
@@ -12,12 +14,14 @@ const KNOWN_GAME_PUBLISHERS: &[&str] = &[
     "cd projekt", "paradox", "devolver", "focus entertainment", "deep silver",
 ];
 
+#[cfg(target_os = "windows")]
 const GAME_ENGINE_FILES: &[&str] = &[
     "unityplayer.dll", "ue4prerequisites", "unrealengine", "cryengine",
     "fmod.dll", "bink2w64.dll", "steam_api.dll", "steam_api64.dll",
     "eossdk-win64-shipping.dll", "galaxydll.dll", "galaxy64.dll",
 ];
 
+#[cfg(target_os = "windows")]
 const BLACKLIST_APPS: &[&str] = &[
     "chrome", "firefox", "edge", "microsoft", "office", "visual studio",
     "discord", "spotify", "steam client", "epic games launcher", "adobe",
@@ -77,6 +81,7 @@ println!("Install Location: {}", install_location);
     })
 }
 
+#[cfg(target_os = "windows")]
 fn is_game(name: &str, install_path: &str, publisher: &str) -> bool {
     let name_lower = name.to_lowercase();
     let publisher_lower = publisher.to_lowercase();
@@ -96,6 +101,7 @@ fn is_game(name: &str, install_path: &str, publisher: &str) -> bool {
     false
 }
 
+#[cfg(target_os = "windows")]
 fn has_game_engine_files(install_path: &str) -> bool {
     let path = Path::new(install_path);
     if !path.exists() {
@@ -114,6 +120,7 @@ fn has_game_engine_files(install_path: &str) -> bool {
     false
 }
 
+#[cfg(target_os = "windows")]
 fn find_game_executable(install_path: &str) -> Option<String> {
     if install_path.is_empty() {
         return None;
@@ -152,6 +159,7 @@ fn find_game_executable(install_path: &str) -> Option<String> {
     exes.first().map(|(name, _)| name.clone())
 }
 
+#[cfg(target_os = "windows")]
 fn extract_exe_from_uninstall(uninstall_string: &str) -> Option<String> {
     let cleaned = uninstall_string.trim_matches('"');
     let path = Path::new(cleaned);

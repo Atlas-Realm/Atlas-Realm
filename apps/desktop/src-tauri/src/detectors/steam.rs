@@ -83,17 +83,13 @@ fn parse_acf_file(path: &Path, steam_common: &Path) -> Option<GameMetadata> {
     let game_folder = steam_common.join(install_dir);
 
     if let Some(exe_name) = crate::detectors::utils::find_best_exe_recursive(&game_folder) {
-        // Steam CDN URLs
-        let cover_image = format!("https://cdn.akamai.steamstatic.com/steam/apps/{}/library_600x900.jpg", app_id);
-        let header_image = format!("https://cdn.akamai.steamstatic.com/steam/apps/{}/header.jpg", app_id);
-
         return Some(GameMetadata {
             name: display_name,
             exe_name,
             platform: "Steam".to_string(),
             app_id: Some(app_id),
-            icon: Some(header_image),
-            cover_image: Some(cover_image),
+            icon: None,
+            cover_image: None,
             developer: None,
             publisher: None,
             genres: Vec::new(),
