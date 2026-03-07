@@ -16,6 +16,11 @@ fn get_steam_path() -> Option<String> {
     Some(r"C:\Program Files (x86)\Steam\steamapps".to_string())
 }
 
+#[cfg(not(target_os = "windows"))]
+fn get_steam_path() -> Option<String> {
+    None
+}
+
 pub fn discover_steam_games() -> Vec<GameMetadata> {
     let mut games = Vec::new();
 

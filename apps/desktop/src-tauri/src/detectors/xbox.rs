@@ -1,8 +1,13 @@
 use crate::models::GameMetadata;
+
+#[cfg(target_os = "windows")]
 use std::path::PathBuf;
+#[cfg(target_os = "windows")]
 use windows::ApplicationModel::Package;
+#[cfg(target_os = "windows")]
 use windows::Management::Deployment::PackageManager;
 
+#[cfg(target_os = "windows")]
 pub fn discover_xbox_games() -> Vec<GameMetadata> {
     let mut games = Vec::new();
     println!("🔍 Scanning for Xbox/Microsoft Store games...");
@@ -59,6 +64,12 @@ pub fn discover_xbox_games() -> Vec<GameMetadata> {
     games
 }
 
+#[cfg(not(target_os = "windows"))]
+pub fn discover_xbox_games() -> Vec<GameMetadata> {
+    Vec::new()
+}
+
+#[cfg(target_os = "windows")]
 fn check_if_game(package: &Package, name: &str) -> Result<Option<(String, Option<String>)>, String> {
     let installed_location = package.InstalledLocation()
         .map_err(|_| "No installed location access".to_string())?;
@@ -109,6 +120,8 @@ fn check_if_game(package: &Package, name: &str) -> Result<Option<(String, Option
 
     Ok(None)
 }
+
+#[cfg(target_os = "windows")]
 fn find_real_game_exe(package_path: &PathBuf, game_name: &str) -> Option<String> {
     let config_path = package_path.join("MicrosoftGame.config");
     if config_path.exists() {

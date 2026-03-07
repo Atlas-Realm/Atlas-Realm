@@ -1,6 +1,8 @@
 use crate::models::GameMetadata;
 use std::path::Path;
+#[cfg(target_os = "windows")]
 use winreg::enums::*;
+#[cfg(target_os = "windows")]
 use winreg::RegKey;
 
 pub fn discover_ubisoft_games() -> Vec<GameMetadata> {

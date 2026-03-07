@@ -74,6 +74,7 @@ fn get_fuel_library_paths() -> Option<Vec<String>> {
     Some(paths)
 }
 
+#[cfg(target_os = "windows")]
 fn get_amazon_path() -> Option<String> {
     use winreg::RegKey;
     use winreg::enums::*;
@@ -85,6 +86,11 @@ fn get_amazon_path() -> Option<String> {
         }
     }
 
+    None
+}
+
+#[cfg(not(target_os = "windows"))]
+fn get_amazon_path() -> Option<String> {
     None
 }
 

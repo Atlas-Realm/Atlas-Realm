@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::path::Path;
+#[cfg(target_os = "windows")]
 use winreg::enums::*;
+#[cfg(target_os = "windows")]
 use winreg::RegKey;
 
 const KNOWN_GAME_PUBLISHERS: &[&str] = &[
@@ -24,6 +26,7 @@ const BLACKLIST_APPS: &[&str] = &[
     "directx", "visual c++", "redistributable", ".net", "framework",
 ];
 
+#[cfg(target_os = "windows")]
 pub fn discover_registry_games() -> HashSet<String> {
     let mut games = HashSet::new();
 
@@ -49,6 +52,12 @@ pub fn discover_registry_games() -> HashSet<String> {
     games
 }
 
+#[cfg(not(target_os = "windows"))]
+pub fn discover_registry_games() -> HashSet<String> {
+    HashSet::new()
+}
+
+#[cfg(target_os = "windows")]
 fn process_registry_entry(key: &RegKey) -> Option<String> {
     println!("Processing registry entry: {:?}", key);
     let display_name: String = key.get_value("DisplayName").ok()?;
