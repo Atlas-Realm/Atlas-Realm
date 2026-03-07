@@ -1,0 +1,4 @@
+interface:
+  display_name: "Atlas Server Architecture"
+  short_description: "Enforce Atlas server OOP architecture"
+  default_prompt: "Use $atlas-server-oop-architecture to implement a server task while preserving Atlas OOP layering and existing libraries."

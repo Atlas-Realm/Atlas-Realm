@@ -3,15 +3,19 @@ services:
     image: postgres:16-alpine
     container_name: atlas_realm_postgres
     environment:
-      POSTGRES_USER: atlas
-      POSTGRES_PASSWORD: atlas_secret
-      POSTGRES_DB: atlas_realm
+      POSTGRES_USER: ${POSTGRES_USER:-atlas}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-atlas_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-atlas_realm}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U atlas -d atlas_realm"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-atlas} -d ${POSTGRES_DB:-atlas_realm}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -21,7 +25,7 @@ services:
     container_name: atlas_realm_redis
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
