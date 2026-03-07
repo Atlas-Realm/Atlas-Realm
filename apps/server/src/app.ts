@@ -19,6 +19,16 @@ import { t } from "@/lib/i18n";
 import { errorHandler } from "@/middleware/error-handler";
 
 export function createApp() {
+  const allowedOrigins =
+    env.NODE_ENV === "production"
+      ? ["tauri://localhost", "https://tauri.localhost"]
+      : [
+          "http://localhost:1420",
+          "http://127.0.0.1:1420",
+          "tauri://localhost",
+          "https://tauri.localhost",
+        ];
+
   const app = new OpenAPIHono({
     defaultHook: (result, c) => {
       if (!result.success) {
@@ -58,7 +68,10 @@ export function createApp() {
   app.use(
     "*",
     cors({
-      origin: env.NODE_ENV === "production" ? "tauri://localhost" : "*",
+      origin: (origin) => {
+        if (!origin) return origin;
+        return allowedOrigins.includes(origin) ? origin : "";
+      },
       allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
       allowHeaders: ["Content-Type", "Authorization", "Accept-Language"],
       credentials: true,

@@ -33,6 +33,22 @@ function notifyUnauthorized() {
   }
 }
 
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  try {
+    return await Promise.race<T>([
+      promise,
+      new Promise<T>((resolve) => {
+        timer = setTimeout(() => resolve(fallback), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) {
+      clearTimeout(timer);
+    }
+  }
+}
+
 const http = axios.create({
   baseURL: API_BASE_URL,
   timeout: 20_000,
@@ -87,9 +103,12 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   }
 
   if (response.status === 401 && auth && retry) {
-    const refreshed = await refreshAuthTokens(API_BASE_URL);
-    if (refreshed) {
-      return request<T>(path, { ...options, retry: false, auth: true });
+    const isAuthMeRequest = path.startsWith("/api/auth/me");
+    if (!isAuthMeRequest) {
+      const refreshed = await withTimeout(refreshAuthTokens(API_BASE_URL), 3_000, null);
+      if (refreshed) {
+        return request<T>(path, { ...options, retry: false, auth: true });
+      }
     }
 
     void clearAuthTokens();
