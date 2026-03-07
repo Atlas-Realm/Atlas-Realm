@@ -4,10 +4,7 @@ export function mapDetectedGamesToSyncItems(games: GameMetadata[]) {
   return games.map((game) => {
     const normalizedPlatform = game.platform?.trim() || "Manual";
     const source = normalizedPlatform === "Steam" ? "steam" : "manual";
-    const externalId =
-      source === "steam"
-        ? game.app_id || game.exe_name
-        : game.exe_name;
+    const externalId = source === "steam" ? game.app_id || game.exe_name : game.exe_name;
 
     return {
       game: {
