@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "games_external_id_source_unique" ON "games" USING btree ("external_id","source");

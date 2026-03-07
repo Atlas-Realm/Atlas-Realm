@@ -2,11 +2,15 @@
   "name": "server",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
-    "db:seed": "bun run src/db/seed.ts"
+    "db:seed": "bun run src/db/seed.ts",
+    "db:setup": "drizzle-kit migrate",
+    "db:setup:seed": "drizzle-kit migrate && bun run src/db/seed.ts",
+    "bootstrap:prod": "drizzle-kit migrate"
   },
   "dependencies": {
     "@hono/zod-openapi": "^0.19.6",

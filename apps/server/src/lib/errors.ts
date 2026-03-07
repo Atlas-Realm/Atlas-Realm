@@ -17,6 +17,12 @@ export class UnauthorizedError extends AppError {
   }
 }
 
+export class BadRequestError extends AppError {
+  constructor(messageKey: TranslationKey = "errors.bad_request") {
+    super(400, messageKey, "BAD_REQUEST");
+  }
+}
+
 export class ForbiddenError extends AppError {
   constructor(messageKey: TranslationKey = "errors.forbidden") {
     super(403, messageKey, "FORBIDDEN");

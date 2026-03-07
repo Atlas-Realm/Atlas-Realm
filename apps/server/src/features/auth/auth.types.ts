@@ -1,4 +1,17 @@
-import type { User, NewUser } from "@/db/schema";
+import type { NewUser, User } from "@/db/schema";
+
+export type AuthUser = {
+  id: string;
+  email: string;
+  username: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+};
+
+export type AuthTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
 
 export interface IAuthRepository {
   findByEmail(email: string): Promise<User | undefined>;
@@ -8,23 +21,10 @@ export interface IAuthRepository {
 }
 
 export interface IAuthService {
-  register(
-    email: string,
-    username: string,
-    password: string,
-  ): Promise<{
-    user: { id: string; email: string; username: string };
-    tokens: { accessToken: string; refreshToken: string };
-  }>;
-  login(
-    email: string,
-    password: string,
-  ): Promise<{
-    user: { id: string; email: string; username: string };
-    tokens: { accessToken: string; refreshToken: string };
-  }>;
-  refresh(refreshToken: string): Promise<{
-    tokens: { accessToken: string; refreshToken: string };
-  }>;
-  logout(userId: string, refreshJti: string): Promise<void>;
+  register(email: string, username: string, password: string): Promise<{ user: AuthUser; tokens: AuthTokens }>;
+  login(email: string, password: string): Promise<{ user: AuthUser; tokens: AuthTokens }>;
+  refresh(refreshToken: string): Promise<{ tokens: AuthTokens }>;
+  logout(userId: string, refreshToken: string): Promise<void>;
+  me(userId: string): Promise<AuthUser>;
+  getOAuthUrl(provider: "google" | "discord"): Promise<{ provider: "google" | "discord"; url: string | null }>;
 }

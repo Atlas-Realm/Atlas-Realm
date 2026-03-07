@@ -119,3 +119,19 @@ Desktop Client (local)     Server
 │ POST /end        │─────▶│ Final kayıt    │
 └──────────────────┘      └────────────────┘
 ```
+
+## Client TODO (Server sonrası)
+
+- [ ] Auth akışı: `/api/auth/register|login|refresh|logout|me` entegrasyonu, access/refresh token güvenli saklama.
+- [ ] Kullanıcı profili: `/api/users/me` görüntüleme + güncelleme UI, `/api/users/search` ve `/api/users/:username` profiline geçiş.
+- [ ] Kütüphane sync: local tarama sonuçlarını `/api/games/library/sync` ile toplu gönderme.
+- [ ] Kütüphane yönetimi: manuel ekleme (`POST /api/games/library`), güncelleme (`PATCH`), silme (`DELETE`) ekranları.
+- [ ] Oyun arama: `/api/games/search?q=&source=` ile arama + sonuçlardan kütüphaneye ekleme.
+- [ ] Session tracking: oyun açılışında `/api/sessions/start`, her ~60sn `/api/sessions/heartbeat`, kapanışta `/api/sessions/end`.
+- [ ] Offline-first queue: heartbeat/end çağrılarını offline durumda local kuyruğa alıp online olunca flush etme.
+- [ ] Session ekranları: aktif oturum (`/api/sessions/active`), geçmiş (`/api/sessions/history`), oyun bazlı istatistik (`/api/sessions/stats/:gameId`).
+- [ ] Sosyal akış: arkadaş listesi/istekleri için `/api/social/*` endpointlerini UI ile bağlama.
+- [ ] Chat UI: konuşma listesi, mesaj geçmişi, gönderme ve okundu işaretleme (`/api/chat/*`).
+- [ ] Bildirim merkezi: `/api/notifications` listeleme, tekil okundu, toplu okundu.
+- [ ] Activity feed: arkadaş aktiviteleri (`/api/activities/feed`) ve kişisel aktiviteler (`/api/activities/me`) ekranı.
+- [ ] Socket planı: MVP REST tamamlandıktan sonra `task.md`deki Socket.IO eventleri için websocket katmanı planlama/uygulama.

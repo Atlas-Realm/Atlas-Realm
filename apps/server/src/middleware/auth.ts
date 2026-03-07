@@ -17,15 +17,15 @@ export const authMiddleware = createMiddleware<{
 }>(async (c, next) => {
   const authHeader = c.req.header("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
-    throw new UnauthorizedError("Missing or invalid authorization header");
+    throw new UnauthorizedError("errors.invalid_auth_header");
   }
 
   const token = authHeader.slice(7);
   try {
-    const payload = await verify(token, env.JWT_ACCESS_SECRET);
+    const payload = await verify(token, env.JWT_ACCESS_SECRET, "HS256");
     c.set("user", payload as JWTPayload);
   } catch {
-    throw new UnauthorizedError("Invalid or expired token");
+    throw new UnauthorizedError("errors.invalid_token");
   }
 
   await next();

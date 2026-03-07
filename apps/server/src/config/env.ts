@@ -14,6 +14,8 @@ const envSchema = z.object({
   RAWG_API_KEY: z.string().optional(),
   IGDB_CLIENT_ID: z.string().optional(),
   IGDB_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_OAUTH_URL: z.string().url().optional(),
+  DISCORD_OAUTH_URL: z.string().url().optional(),
 });
 
 const parsed = envSchema.safeParse(Bun.env);

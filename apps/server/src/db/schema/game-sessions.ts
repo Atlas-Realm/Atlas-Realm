@@ -15,6 +15,7 @@ export const gameSessions = pgTable("game_sessions", {
   startedAt: timestamp("started_at").notNull().defaultNow(),
   endedAt: timestamp("ended_at"),
   durationSeconds: integer("duration_seconds"),
+  lastHeartbeatAt: timestamp("last_heartbeat_at"),
   status: sessionStatusEnum("status").notNull().default("active"),
 });
 
