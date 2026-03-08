@@ -1,6 +1,7 @@
 import axios, { AxiosError, type Method } from "axios";
 import type { ApiErrorShape, ApiSuccessShape } from "../types";
 import { API_BASE_URL } from "../config/env";
+import { detectPreferredLocale } from "../config/ui-preferences";
 import { clearAuthTokens, getAccessToken, refreshAuthTokens } from "../tauri/client";
 
 export class ApiRequestError extends Error {
@@ -82,6 +83,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   const retry = options.retry ?? true;
 
   const headers: Record<string, string> = {};
+  headers["Accept-Language"] = detectPreferredLocale();
   if (auth) {
     const token = await getAccessToken();
     if (token) {

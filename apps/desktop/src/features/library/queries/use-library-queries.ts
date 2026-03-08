@@ -36,6 +36,17 @@ export function useLibraryQuery() {
   return query;
 }
 
+export function useGameDetailQuery(gameId: string) {
+  const hasToken = useAuthStore((state) => state.hasToken);
+
+  return useQuery({
+    queryKey: queryKeys.games.detail(gameId),
+    queryFn: () => libraryApi.getGameById(gameId),
+    enabled: hasToken && gameId.length > 0,
+    staleTime: 60_000,
+  });
+}
+
 export function useLibrarySearchQuery(query: string, source: "rawg" | "steam", enabled: boolean) {
   const hasToken = useAuthStore((state) => state.hasToken);
 

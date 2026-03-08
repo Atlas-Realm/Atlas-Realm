@@ -9,6 +9,10 @@ export interface ApiSuccessShape<T> {
   data: T;
 }
 
+export type UILocale = "tr" | "en";
+
+export type UITheme = "atlas-glass" | "atlas-ocean" | "atlas-frost" | "atlas-carbon";
+
 export interface AuthUser {
   id: string;
   email: string;
@@ -26,6 +30,64 @@ export interface UserProfile {
   avatarUrl: string | null;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  userId: string;
+  type: "friend_request" | "friend_accept" | "chat_message" | "activity" | "system";
+  title: string;
+  message: string;
+  data: Record<string, unknown> | null;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface FriendListItem {
+  id: string;
+  username: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+  createdAt: string;
+}
+
+export interface PendingFriendRequest {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  status: "pending" | "accepted" | "rejected";
+  createdAt: string;
+  sender: FriendListItem;
+}
+
+export interface ActivityRecord {
+  id: string;
+  actorId: string;
+  type: string;
+  payload: Record<string, unknown> | null;
+  visibility: "public" | "friends" | "private";
+  createdAt: string;
+}
+
+export interface ActivityFeedItem {
+  id: string;
+  actorId: string;
+  actorName: string;
+  actorAvatarUrl: string | null;
+  createdAt: string;
+  body: string;
+  title: string;
+  source: "server" | "local";
+  accentLabel: string;
+}
+
+export interface LocalActivityPost {
+  id: string;
+  actorId: string;
+  actorName: string;
+  actorAvatarUrl: string | null;
+  body: string;
+  createdAt: string;
 }
 
 export interface AuthTokens {
@@ -66,6 +128,17 @@ export interface ServerGame {
   lastFetchedAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface GameDetailViewModel {
+  game: ServerGame;
+  library: LibraryRow | null;
+  heroImage: string | null;
+  description: string | null;
+  developer: string | null;
+  publisher: string | null;
+  releaseDate: string | null;
+  genres: string[];
 }
 
 export interface LibraryRow {

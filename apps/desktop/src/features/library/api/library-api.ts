@@ -2,6 +2,10 @@ import { request } from "../../../shared/api/http-client";
 import type { GameSearchResult, LibraryItem } from "../../../shared/types";
 
 export const libraryApi = {
+  getGameById(gameId: string) {
+    return request<LibraryItem["game"]>(`/api/games/${gameId}`);
+  },
+
   listLibrary() {
     return request<LibraryItem[]>("/api/games/library");
   },

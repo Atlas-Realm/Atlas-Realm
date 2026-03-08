@@ -1,41 +1,124 @@
 @import "tailwindcss";
 @plugin "daisyui";
 @plugin "daisyui/theme" {
-  name: "atlas";
+  name: "atlas-glass";
   default: true;
   prefersdark: true;
   color-scheme: dark;
 
-  --color-base-100: oklch(19% 0.025 195);
-  --color-base-200: oklch(24% 0.03 192);
-  --color-base-300: oklch(29% 0.03 190);
-  --color-base-content: oklch(95% 0.015 190);
+  --color-base-100: oklch(15% 0.025 205);
+  --color-base-200: oklch(19% 0.03 205);
+  --color-base-300: oklch(25% 0.032 205);
+  --color-base-content: oklch(95% 0.01 200);
 
-  --color-primary: oklch(79% 0.14 186);
-  --color-primary-content: oklch(19% 0.025 195);
-  --color-secondary: oklch(70% 0.12 166);
-  --color-secondary-content: oklch(19% 0.02 185);
-  --color-accent: oklch(73% 0.15 207);
-  --color-accent-content: oklch(19% 0.025 195);
+  --color-primary: oklch(82% 0.11 186);
+  --color-primary-content: oklch(15% 0.025 205);
+  --color-secondary: oklch(73% 0.09 165);
+  --color-secondary-content: oklch(14% 0.02 205);
+  --color-accent: oklch(75% 0.08 230);
+  --color-accent-content: oklch(14% 0.02 205);
 
-  --color-neutral: oklch(24% 0.025 200);
-  --color-neutral-content: oklch(95% 0.015 190);
+  --color-neutral: oklch(24% 0.025 210);
+  --color-neutral-content: oklch(95% 0.01 200);
   --color-info: oklch(76% 0.08 215);
   --color-success: oklch(74% 0.14 156);
-  --color-warning: oklch(79% 0.14 83);
-  --color-error: oklch(69% 0.18 26);
+  --color-warning: oklch(82% 0.14 89);
+  --color-error: oklch(68% 0.18 25);
 
-  --radius-box: 1rem;
+  --radius-box: 1.25rem;
   --radius-btn: 9999px;
-  --radius-selector: 0.75rem;
+  --radius-selector: 1rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
 
+@plugin "daisyui/theme" {
+  name: "atlas-ocean";
+  color-scheme: dark;
+
+  --color-base-100: oklch(17% 0.03 230);
+  --color-base-200: oklch(21% 0.035 228);
+  --color-base-300: oklch(27% 0.04 225);
+  --color-base-content: oklch(95% 0.012 220);
+  --color-primary: oklch(78% 0.12 210);
+  --color-primary-content: oklch(14% 0.03 230);
+  --color-secondary: oklch(74% 0.08 182);
+  --color-secondary-content: oklch(14% 0.03 230);
+  --color-accent: oklch(72% 0.12 255);
+  --color-accent-content: oklch(14% 0.03 230);
+  --color-neutral: oklch(25% 0.03 228);
+  --color-neutral-content: oklch(95% 0.012 220);
+  --color-info: oklch(75% 0.09 230);
+  --color-success: oklch(73% 0.14 160);
+  --color-warning: oklch(81% 0.14 90);
+  --color-error: oklch(68% 0.18 24);
+  --radius-box: 1.25rem;
+  --radius-btn: 9999px;
+  --radius-selector: 1rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "atlas-frost";
+  color-scheme: dark;
+
+  --color-base-100: oklch(90% 0.01 230);
+  --color-base-200: oklch(84% 0.015 225);
+  --color-base-300: oklch(77% 0.018 220);
+  --color-base-content: oklch(24% 0.02 220);
+  --color-primary: oklch(62% 0.1 205);
+  --color-primary-content: oklch(96% 0.005 230);
+  --color-secondary: oklch(58% 0.08 180);
+  --color-secondary-content: oklch(96% 0.005 230);
+  --color-accent: oklch(64% 0.08 250);
+  --color-accent-content: oklch(96% 0.005 230);
+  --color-neutral: oklch(69% 0.02 220);
+  --color-neutral-content: oklch(21% 0.02 220);
+  --color-info: oklch(66% 0.08 220);
+  --color-success: oklch(64% 0.12 160);
+  --color-warning: oklch(78% 0.14 90);
+  --color-error: oklch(62% 0.18 25);
+  --radius-box: 1.25rem;
+  --radius-btn: 9999px;
+  --radius-selector: 1rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "atlas-carbon";
+  color-scheme: dark;
+
+  --color-base-100: oklch(13% 0.01 250);
+  --color-base-200: oklch(17% 0.012 250);
+  --color-base-300: oklch(22% 0.014 250);
+  --color-base-content: oklch(94% 0.006 240);
+  --color-primary: oklch(78% 0.08 176);
+  --color-primary-content: oklch(12% 0.01 250);
+  --color-secondary: oklch(64% 0.06 210);
+  --color-secondary-content: oklch(12% 0.01 250);
+  --color-accent: oklch(70% 0.04 280);
+  --color-accent-content: oklch(12% 0.01 250);
+  --color-neutral: oklch(23% 0.012 250);
+  --color-neutral-content: oklch(94% 0.006 240);
+  --color-info: oklch(72% 0.05 225);
+  --color-success: oklch(70% 0.1 160);
+  --color-warning: oklch(78% 0.14 90);
+  --color-error: oklch(64% 0.18 25);
+  --radius-box: 1.25rem;
+  --radius-btn: 9999px;
+  --radius-selector: 1rem;
   --border: 1px;
   --depth: 0;
   --noise: 0;
 }
 
 :root {
-  font-family: "Sora", "Avenir Next", "Segoe UI", sans-serif;
+  font-family: "Avenir Next", "Sora", "SF Pro Display", "Segoe UI", sans-serif;
 }
 
 html,
@@ -47,32 +130,314 @@ body,
 
 body {
   background:
-    radial-gradient(circle at 15% 10%, color-mix(in oklab, var(--color-primary) 20%, transparent), transparent 40%),
-    radial-gradient(circle at 85% 75%, color-mix(in oklab, var(--color-secondary) 16%, transparent), transparent 45%),
-    linear-gradient(145deg, #031516 0%, #071f22 50%, #04181a 100%);
+    radial-gradient(circle at 10% 12%, color-mix(in oklab, var(--color-primary) 16%, transparent), transparent 28%),
+    radial-gradient(circle at 84% 18%, color-mix(in oklab, var(--color-accent) 13%, transparent), transparent 32%),
+    radial-gradient(circle at 72% 78%, color-mix(in oklab, var(--color-secondary) 12%, transparent), transparent 34%),
+    linear-gradient(145deg, color-mix(in oklab, var(--color-base-100) 88%, black) 0%, color-mix(in oklab, var(--color-base-200) 80%, black) 48%, color-mix(in oklab, var(--color-base-100) 82%, black) 100%);
   color: var(--color-base-content);
 }
 
-.drawer-side .menu li > *:not(ul):not(.menu-title):not(details):active,
-.drawer-side .menu li > *:not(ul):not(.menu-title):not(details).active {
-  background: color-mix(in oklab, var(--color-primary) 20%, transparent);
-  color: var(--color-base-content);
+body[data-motion="reduced"] *,
+body[data-motion="reduced"] *::before,
+body[data-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
 
-.hero {
+body[data-effects="flat"] .atlas-glass-panel,
+body[data-effects="flat"] .atlas-hero-card,
+body[data-effects="flat"] .atlas-detail-hero {
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+input,
+textarea,
+select {
+  color: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in oklab, var(--color-base-content) 38%, transparent);
+}
+
+.atlas-glass-panel,
+.atlas-hero-card,
+.atlas-detail-hero {
   position: relative;
-  overflow: hidden;
+  border-radius: 1.75rem;
+  background:
+    linear-gradient(180deg, color-mix(in oklab, white 6%, transparent), transparent 24%),
+    color-mix(in oklab, var(--color-base-200) 64%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 18px 60px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(26px) saturate(135%);
 }
 
-.hero::before {
+.atlas-glass-panel::before,
+.atlas-hero-card::before,
+.atlas-detail-hero::before {
   content: "";
   position: absolute;
   inset: 0;
+  border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(120deg, rgba(2, 17, 19, 0.2), rgba(2, 15, 17, 0.55));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 38%);
 }
 
-.hero > * {
+.atlas-hero-card,
+.atlas-detail-hero {
+  isolation: isolate;
+  min-height: 20rem;
+}
+
+.atlas-hero-image,
+.atlas-detail-image {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.24;
+  filter: saturate(1.05) contrast(1.05);
+}
+
+.atlas-hero-card::after,
+.atlas-detail-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(115deg, rgba(2, 10, 14, 0.86), rgba(2, 16, 18, 0.34));
+  z-index: 0;
+}
+
+.atlas-pill {
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.48rem 0.95rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);
+  background: color-mix(in oklab, var(--color-primary) 12%, transparent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.atlas-primary-btn,
+.atlas-secondary-btn {
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  min-height: 3rem;
+  padding-inline: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.atlas-primary-btn {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--color-primary) 92%, white 6%), color-mix(in oklab, var(--color-secondary) 72%, white 10%));
+  color: var(--color-primary-content);
+  box-shadow: 0 12px 30px color-mix(in oklab, var(--color-primary) 26%, transparent);
+}
+
+.atlas-primary-btn:hover {
+  transform: translateY(-1px);
+}
+
+.atlas-secondary-btn {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+}
+
+.atlas-secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.atlas-input-shell,
+.atlas-select-shell,
+.atlas-textarea-shell {
+  width: 100%;
+  border-radius: 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.14);
+  padding: 0.95rem 1rem;
+  color: inherit;
+  outline: none;
+  backdrop-filter: blur(16px);
+}
+
+.atlas-input-shell {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.atlas-input-shell input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  outline: none;
+}
+
+.atlas-textarea-shell {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.atlas-input-shell:focus-within,
+.atlas-select-shell:focus,
+.atlas-textarea-shell:focus {
+  border-color: color-mix(in oklab, var(--color-primary) 40%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-primary) 10%, transparent);
+}
+
+.atlas-icon-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  padding: 0.75rem 1rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.atlas-icon-switch.is-active {
+  background: color-mix(in oklab, var(--color-primary) 18%, transparent);
+  border-color: color-mix(in oklab, var(--color-primary) 20%, transparent);
+  color: white;
+}
+
+.atlas-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-height: 3.35rem;
+  border-radius: 1.2rem;
+  padding-inline: 1rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.atlas-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.atlas-nav-item.is-active {
+  border: 1px solid color-mix(in oklab, var(--color-primary) 28%, transparent);
+  background: linear-gradient(135deg, color-mix(in oklab, var(--color-primary) 14%, transparent), rgba(255, 255, 255, 0.04));
+  color: white;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.atlas-empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 12rem;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.58);
+  text-align: center;
+}
+
+.atlas-logo-glow {
+  box-shadow: 0 0 32px color-mix(in oklab, var(--color-primary) 22%, transparent);
+}
+
+.atlas-avatar-ring > div {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 4px rgba(255, 255, 255, 0.02);
+}
+
+.atlas-auth-stage {
   position: relative;
-  z-index: 1;
+  background:
+    radial-gradient(circle at 20% 18%, color-mix(in oklab, var(--color-primary) 18%, transparent), transparent 30%),
+    linear-gradient(145deg, rgba(1, 7, 10, 0.9), rgba(3, 16, 18, 0.58)),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.03), transparent 60%);
+}
+
+.atlas-theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.12);
+  padding: 1rem;
+  text-align: left;
+}
+
+.atlas-theme-card.is-active {
+  border-color: color-mix(in oklab, var(--color-primary) 24%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-primary) 16%, transparent);
+}
+
+.atlas-theme-preview {
+  display: block;
+  height: 6rem;
+  border-radius: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.atlas-theme-preview[data-theme-preview="atlas-glass"] {
+  background: linear-gradient(145deg, rgba(7, 18, 22, 0.95), rgba(20, 65, 73, 0.68));
+}
+
+.atlas-theme-preview[data-theme-preview="atlas-ocean"] {
+  background: linear-gradient(145deg, rgba(9, 24, 45, 0.95), rgba(14, 67, 98, 0.72));
+}
+
+.atlas-theme-preview[data-theme-preview="atlas-frost"] {
+  background: linear-gradient(145deg, rgba(225, 233, 241, 0.95), rgba(165, 193, 214, 0.85));
+}
+
+.atlas-theme-preview[data-theme-preview="atlas-carbon"] {
+  background: linear-gradient(145deg, rgba(16, 16, 18, 0.95), rgba(44, 47, 54, 0.85));
+}
+
+.atlas-toggle-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.12);
+  padding: 1rem;
+}
+
+.table :where(th, td) {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.drawer-side .drawer-overlay {
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+}
+
+@media (max-width: 1023px) {
+  .atlas-shell-grid {
+    display: block;
+  }
 }

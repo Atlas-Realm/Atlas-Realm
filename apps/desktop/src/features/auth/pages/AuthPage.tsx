@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useI18n } from "../../../shared/i18n/i18n-provider";
 import { useLoginMutation, useRegisterMutation } from "../queries/use-auth-queries";
 import { useAuthStore } from "../store/auth-store";
 
 export default function AuthPage() {
+  const { t } = useI18n();
   const mode = useAuthStore((state) => state.mode);
   const authError = useAuthStore((state) => state.authError);
   const setMode = useAuthStore((state) => state.setMode);
@@ -27,97 +29,97 @@ export default function AuthPage() {
         await registerMutation.mutateAsync({ email, username, password });
       }
     } catch {
-      // Error state handled in mutation callbacks.
+      // Error state is handled in mutation callbacks.
     }
   };
 
   return (
-    <div className="min-h-screen bg-base-100 flex items-center justify-center p-6">
-      <article className="card w-full max-w-lg bg-base-200 border border-base-300 shadow-2xl">
-        <div className="card-body gap-4">
-          <div>
-            <h1 className="card-title text-3xl">Atlas Realm Desktop</h1>
-            <p className="text-sm opacity-70">High-performance launcher for your synced game library.</p>
-          </div>
+    <div className="min-h-screen p-6">
+      <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl items-center justify-center">
+        <div className="grid w-full max-w-5xl overflow-hidden rounded-[2rem] border border-white/10 bg-black/20 shadow-2xl backdrop-blur-xl lg:grid-cols-[minmax(0,1.1fr)_28rem]">
+          <section className="atlas-auth-stage hidden min-h-[42rem] p-10 lg:flex lg:flex-col lg:justify-end">
+            <span className="atlas-pill mb-6 inline-flex w-fit">Atlas Realm</span>
+            <h1 className="max-w-lg text-5xl font-black uppercase leading-none text-white">{t("auth.title")}</h1>
+            <p className="mt-5 max-w-lg text-base leading-8 text-white/70">{t("auth.subtitle")}</p>
+          </section>
 
-          <div className="tabs tabs-box bg-base-300">
-            <button
-              type="button"
-              className={`tab flex-1 ${mode === "login" ? "tab-active" : ""}`}
-              onClick={() => {
-                setMode("login");
-                setAuthError(null);
-              }}
-            >
-              Login
-            </button>
-            <button
-              type="button"
-              className={`tab flex-1 ${mode === "register" ? "tab-active" : ""}`}
-              onClick={() => {
-                setMode("register");
-                setAuthError(null);
-              }}
-            >
-              Register
-            </button>
-          </div>
+          <article className="p-6 md:p-8">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/45">Atlas Realm</p>
+              <h2 className="mt-3 text-3xl font-semibold text-white">{mode === "login" ? t("auth.login") : t("auth.register")}</h2>
+            </div>
 
-          <form className="grid gap-3" onSubmit={handleSubmit}>
-            <label className="form-control gap-1">
-              <span className="label-text">Email</span>
-              <input
-                className="input input-bordered"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                type="email"
-                required
-                autoComplete="email"
-              />
-            </label>
+            <div className="mt-6 inline-flex rounded-full border border-white/10 bg-black/10 p-1">
+              <button
+                type="button"
+                className={`atlas-icon-switch px-5 ${mode === "login" ? "is-active" : ""}`}
+                onClick={() => {
+                  setMode("login");
+                  setAuthError(null);
+                }}
+              >
+                {t("auth.login")}
+              </button>
+              <button
+                type="button"
+                className={`atlas-icon-switch px-5 ${mode === "register" ? "is-active" : ""}`}
+                onClick={() => {
+                  setMode("register");
+                  setAuthError(null);
+                }}
+              >
+                {t("auth.register")}
+              </button>
+            </div>
 
-            {mode === "register" ? (
-              <label className="form-control gap-1">
-                <span className="label-text">Username</span>
+            <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
+              <label className="grid gap-2 text-sm text-white/70">
+                <span>{t("auth.email")}</span>
+                <input className="atlas-input-shell" value={email} onChange={(event) => setEmail(event.target.value)} type="email" required autoComplete="email" />
+              </label>
+
+              {mode === "register" ? (
+                <label className="grid gap-2 text-sm text-white/70">
+                  <span>{t("auth.username")}</span>
+                  <input
+                    className="atlas-input-shell"
+                    value={username}
+                    onChange={(event) => setUsername(event.target.value)}
+                    type="text"
+                    minLength={3}
+                    maxLength={32}
+                    required
+                    autoComplete="username"
+                  />
+                </label>
+              ) : null}
+
+              <label className="grid gap-2 text-sm text-white/70">
+                <span>{t("auth.password")}</span>
                 <input
-                  className="input input-bordered"
-                  value={username}
-                  onChange={(event) => setUsername(event.target.value)}
-                  type="text"
-                  minLength={3}
-                  maxLength={32}
+                  className="atlas-input-shell"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  type="password"
+                  minLength={8}
                   required
-                  autoComplete="username"
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
                 />
               </label>
-            ) : null}
 
-            <label className="form-control gap-1">
-              <span className="label-text">Password</span>
-              <input
-                className="input input-bordered"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                type="password"
-                minLength={8}
-                required
-                autoComplete={mode === "login" ? "current-password" : "new-password"}
-              />
-            </label>
+              {authError ? (
+                <div role="alert" className="alert alert-error rounded-[1.25rem] border border-error/25 bg-error/10 text-sm">
+                  <span>{authError}</span>
+                </div>
+              ) : null}
 
-            {authError ? (
-              <div role="alert" className="alert alert-error py-2 text-sm">
-                <span>{authError}</span>
-              </div>
-            ) : null}
-
-            <button type="submit" className="btn btn-primary mt-1" disabled={busy}>
-              {busy ? <span className="loading loading-spinner loading-sm" aria-hidden="true" /> : null}
-              {mode === "login" ? "Login" : "Create Account"}
-            </button>
-          </form>
+              <button type="submit" className="btn atlas-primary-btn mt-2" disabled={busy}>
+                {mode === "login" ? (busy ? t("auth.loggingIn") : t("auth.login")) : busy ? t("auth.creatingAccount") : t("auth.createAccount")}
+              </button>
+            </form>
+          </article>
         </div>
-      </article>
+      </div>
     </div>
   );
 }

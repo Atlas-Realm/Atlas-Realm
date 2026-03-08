@@ -1,11 +1,13 @@
 import {
-  Bell,
+  BellDot,
+  ChevronLeft,
+  ChevronRight,
   Gamepad2,
   Home,
   Library,
   Menu,
-  Search,
-  Timer,
+  PanelRightOpen,
+  Settings,
   User,
   Waves,
 } from "lucide-react";
@@ -13,34 +15,105 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useAuthMeQuery } from "../../features/auth/queries/use-auth-queries";
 import { useSessionStore } from "../../features/sessions/store/session-store";
 import { useUiStore } from "../../features/ui/store/ui-store";
+import { useI18n } from "../../shared/i18n/i18n-provider";
+import { displayName, formatHours } from "../../shared/utils/ui-format";
+import { FriendsSidebar, FriendsSidebarContent } from "./components/FriendsSidebar";
+import { NotificationPopover } from "./components/NotificationPopover";
 
-const navItems = [
-  { to: "/", label: "Launcher", icon: Home, end: true },
-  { to: "/library", label: "Library", icon: Library },
-  { to: "/sessions", label: "Sessions", icon: Timer },
-  { to: "/profile", label: "Profile", icon: User },
-];
+const navConfig: Array<{
+  to: string;
+  labelKey: string;
+  icon: typeof Home;
+  end?: boolean;
+}> = [
+  { to: "/", labelKey: "nav.home", icon: Home, end: true },
+  { to: "/library", labelKey: "nav.library", icon: Library },
+  { to: "/activity", labelKey: "nav.activity", icon: BellDot },
+  { to: "/profile", labelKey: "nav.profile", icon: User },
+  { to: "/settings", labelKey: "nav.settings", icon: Settings },
+] as const;
 
-function formatDuration(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) {
-    return `${h}h ${m}m`;
-  }
-  return `${m}m`;
+function SidebarContent() {
+  const { t } = useI18n();
+  const { data: user } = useAuthMeQuery();
+  const collapsed = useUiStore((state) => state.leftSidebarCollapsed);
+  const toggleLeftSidebar = useUiStore((state) => state.toggleLeftSidebar);
+  const closeMobileDrawer = useUiStore((state) => state.closeMobileDrawer);
+
+  return (
+    <aside className={`flex h-full flex-col gap-6 px-4 py-5 ${collapsed ? "items-center" : ""}`}>
+      <div className={`flex items-center ${collapsed ? "justify-center" : "justify-between"} gap-3`}>
+        <div className="flex items-center gap-3 overflow-hidden">
+          <div className="atlas-logo-glow flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+            <Waves size={18} />
+          </div>
+          {!collapsed ? (
+            <div>
+              <p className="text-2xl font-black tracking-[0.08em] text-white">ATLAS</p>
+              <p className="text-xs uppercase tracking-[0.28em] text-white/45">{t("shell.desktopLauncher")}</p>
+            </div>
+          ) : null}
+        </div>
+
+        <button
+          type="button"
+          className="btn btn-circle btn-ghost hidden border border-white/10 bg-white/5 lg:flex"
+          onClick={toggleLeftSidebar}
+          aria-label={collapsed ? t("shell.expandSidebar") : t("shell.collapseSidebar")}
+        >
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </button>
+      </div>
+
+      <nav className="grid gap-1">
+        {navConfig.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={Boolean(item.end)}
+            onClick={closeMobileDrawer}
+            className={({ isActive }) =>
+              `atlas-nav-item ${isActive ? "is-active" : ""} ${collapsed ? "justify-center px-0" : ""}`
+            }
+          >
+            <item.icon size={18} />
+            {!collapsed ? <span>{t(item.labelKey)}</span> : null}
+          </NavLink>
+        ))}
+      </nav>
+
+      <div className="mt-auto rounded-[1.75rem] border border-white/10 bg-black/10 p-3">
+        <div className={`flex items-center gap-3 ${collapsed ? "justify-center" : ""}`}>
+          <div className="avatar atlas-avatar-ring">
+            <div className="w-12 rounded-2xl bg-base-300">
+              {user?.avatarUrl ? <img src={user.avatarUrl} alt={displayName(user)} /> : null}
+            </div>
+          </div>
+          {!collapsed ? (
+            <div className="min-w-0">
+              <p className="truncate font-semibold text-white">{displayName(user ?? {})}</p>
+              <p className="truncate text-sm text-white/55">{user?.email ?? "atlas@realm"}</p>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </aside>
+  );
 }
 
 export function AppShell() {
-  const { data: user } = useAuthMeQuery();
-  const localSessions = useSessionStore((state) => state.localSessions);
+  const { t } = useI18n();
   const mobileDrawerOpen = useUiStore((state) => state.mobileDrawerOpen);
   const toggleMobileDrawer = useUiStore((state) => state.toggleMobileDrawer);
   const closeMobileDrawer = useUiStore((state) => state.closeMobileDrawer);
+  const rightSidebarOpen = useUiStore((state) => state.rightSidebarOpen);
+  const toggleRightSidebar = useUiStore((state) => state.toggleRightSidebar);
+  const localSessions = useSessionStore((state) => state.localSessions);
 
   const activeSession = localSessions.find((session) => session.is_active);
 
   return (
-    <div className="drawer lg:drawer-open bg-base-100">
+    <div className="drawer lg:drawer-open bg-transparent">
       <input
         id="atlas-shell-drawer"
         type="checkbox"
@@ -49,121 +122,74 @@ export function AppShell() {
         onChange={toggleMobileDrawer}
       />
 
-      <div className="drawer-content min-h-screen">
-        <header className="navbar border-b border-base-300 bg-base-100/90 backdrop-blur sticky top-0 z-20">
-          <div className="flex-none lg:hidden">
-            <label
-              htmlFor="atlas-shell-drawer"
-              className="btn btn-square btn-ghost"
-              aria-label="Open sidebar"
-            >
-              <Menu size={18} />
-            </label>
-          </div>
-          <div className="flex-1 px-2 gap-2">
-            <div className="input input-bordered input-sm md:input-md flex items-center gap-2 w-full max-w-xl">
-              <Search size={16} className="opacity-70" />
-              <input type="text" className="grow" placeholder="Search games, friends, store" readOnly />
-            </div>
-          </div>
-          <div className="flex-none gap-2">
-            <button type="button" className="btn btn-ghost btn-circle" disabled aria-label="Notifications">
-              <Bell size={18} />
-            </button>
-            <div className="avatar">
-              <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                <img
-                  src={
-                    user?.avatarUrl ||
-                    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80"
-                  }
-                  alt={user?.username || "avatar"}
-                />
+      <div className="drawer-content min-h-screen px-3 py-3 lg:px-4 lg:py-4">
+        <div className="atlas-shell-grid min-h-[calc(100vh-1.5rem)] gap-4 lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto]">
+          <aside className="atlas-glass-panel hidden w-[17rem] lg:flex lg:flex-col">
+            <SidebarContent />
+          </aside>
+
+          <div className="min-w-0">
+            <header className="atlas-glass-panel mb-4 flex h-20 items-center justify-between px-4 sm:px-6">
+              <div className="flex items-center gap-2 lg:hidden">
+                <label htmlFor="atlas-shell-drawer" className="btn btn-circle btn-ghost border border-white/10 bg-white/5">
+                  <Menu size={18} />
+                </label>
               </div>
-            </div>
-          </div>
-        </header>
-
-        <main className="p-4 md:p-6 pb-24">
-          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
-            <section className="min-w-0">
-              <Outlet />
-            </section>
-
-            <aside className="hidden xl:grid gap-4 sticky top-24">
-              <article className="card bg-base-200 border border-base-300 shadow-xl">
-                <div className="card-body p-4">
-                  <h3 className="card-title text-base">Friends Activity</h3>
-                  <ul className="menu bg-base-200 p-0 gap-2">
-                    {[
-                      ["Alex_Storm", "Playing Valorant"],
-                      ["SarahQuest", "Playing Elden Ring"],
-                      ["TurboDev", "Playing Starfield"],
-                    ].map(([name, status]) => (
-                      <li key={name}>
-                        <div className="justify-between rounded-lg bg-base-100 border border-base-300">
-                          <span className="font-medium">{name}</span>
-                          <span className="text-xs opacity-70">{status}</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </article>
-
-              <article className="card bg-base-200 border border-base-300 shadow-xl">
-                <div className="card-body p-4">
-                  <h4 className="font-semibold uppercase text-primary text-xs tracking-wide">Party Suggestion</h4>
-                  <p className="text-sm opacity-75">Join Alex_Storm in Valorant?</p>
-                  <button type="button" className="btn btn-primary btn-sm" disabled>
-                    Join Party
+              <div className="flex-1" />
+              <div className="flex items-center gap-3">
+                <div className="lg:hidden">
+                  <button
+                    type="button"
+                    className="btn btn-circle btn-ghost border border-white/10 bg-white/5"
+                    onClick={toggleRightSidebar}
+                    aria-label={t("shell.toggleFriends")}
+                  >
+                    <PanelRightOpen size={18} />
                   </button>
                 </div>
-              </article>
+                <NotificationPopover />
+              </div>
+            </header>
+
+            <main className="min-w-0 pb-24">
+              <Outlet />
+            </main>
+          </div>
+
+          <FriendsSidebar />
+        </div>
+
+        {rightSidebarOpen ? (
+          <div className="xl:hidden">
+            <div className="fixed inset-0 z-40 bg-black/45 backdrop-blur-sm" onClick={toggleRightSidebar} />
+            <aside className="atlas-glass-panel fixed inset-y-4 right-4 z-50 flex w-[min(22rem,calc(100vw-2rem))] flex-col overflow-hidden">
+              <FriendsSidebarContent compact onClose={toggleRightSidebar} />
             </aside>
           </div>
-        </main>
+        ) : null}
 
         {activeSession ? (
-          <div className="fixed left-1/2 -translate-x-1/2 bottom-4 z-30">
-            <div className="badge badge-lg badge-primary gap-2 py-4 px-4 text-primary-content shadow-xl">
-              <Gamepad2 size={16} />
-              <span>{activeSession.game_name}</span>
-              <strong>{formatDuration(activeSession.duration_seconds)}</strong>
+          <div className="fixed bottom-5 left-1/2 z-30 -translate-x-1/2">
+            <div className="rounded-full border border-primary/25 bg-primary/15 px-4 py-3 text-sm text-white shadow-2xl backdrop-blur-xl">
+              <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-content">
+                  <Gamepad2 size={16} />
+                </span>
+                <div>
+                  <p className="font-semibold">{activeSession.game_name}</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-white/55">{formatHours(activeSession.duration_seconds)}</p>
+                </div>
+              </div>
             </div>
           </div>
         ) : null}
       </div>
 
-      <div className="drawer-side z-30">
+      <div className="drawer-side z-50 lg:hidden">
         <label htmlFor="atlas-shell-drawer" className="drawer-overlay" onClick={closeMobileDrawer} />
-        <aside className="w-72 min-h-full bg-base-200 border-r border-base-300 p-4 grid content-start gap-4">
-          <div className="flex items-center gap-3 px-2">
-            <div className="w-10 h-10 rounded-xl bg-primary text-primary-content grid place-items-center">
-              <Waves size={18} />
-            </div>
-            <div>
-              <p className="font-black text-2xl tracking-wide">ATLAS</p>
-              <p className="text-xs opacity-70">Desktop Launcher</p>
-            </div>
-          </div>
-
-          <ul className="menu bg-base-200 rounded-box gap-1">
-            {navItems.map((item) => (
-              <li key={item.to}>
-                <NavLink
-                  to={item.to}
-                  end={item.end}
-                  onClick={closeMobileDrawer}
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  <item.icon size={16} />
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </aside>
+        <div className="atlas-glass-panel flex h-full w-[17rem] flex-col">
+          <SidebarContent />
+        </div>
       </div>
     </div>
   );
